@@ -13,6 +13,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
   logout: () => void;
   initialize: () => void;
 }
@@ -118,6 +119,20 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error: any) {
       set({ 
         error: error.message || 'Registration failed', 
+        isLoading: false 
+      });
+      throw error;
+    }
+  },
+
+  resetPassword: async (email) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.auth.requestPasswordReset(email);
+      set({ isLoading: false });
+    } catch (error: any) {
+      set({ 
+        error: error.message || 'Reset request failed', 
         isLoading: false 
       });
       throw error;

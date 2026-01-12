@@ -12,7 +12,8 @@ import {
   AlertTriangle,
   LogOut,
   LayoutDashboard,
-  X
+  X,
+  HelpCircle
 } from 'lucide-react';
 import DashboardView from './components/DashboardView';
 import WatchlistView from './components/WatchlistView';
@@ -23,10 +24,12 @@ import ContradictionView from './components/ContradictionView';
 import AuthPage from './components/AuthPage';
 import TickerDetail from './components/TickerDetail';
 import { SearchModal } from './components/SearchModal';
+import { ProfileModal } from './components/ProfileModal';
+import { HelpModal } from './components/HelpModal';
 import { useAuthStore } from './store/authStore';
 import { NotificationService } from './services/notifications';
 import { api } from './services/api';
-import { Ticker } from './types';
+import { Ticker, User } from './types';
 
 const App: React.FC = () => {
   const { user, isAuthenticated, initialize, logout } = useAuthStore();
@@ -34,6 +37,8 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'watchlist' | 'alerts' | 'analyse' | 'contradictions' | 'settings'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   useEffect(() => {
     initialize();
@@ -62,34 +67,39 @@ const App: React.FC = () => {
     setIsSearchOpen(false);
   };
 
+  const handleUpdateProfile = (updatedUser: User) => {
+    useAuthStore.setState({ user: updatedUser });
+  };
+
   const NavItem = ({ id, label, icon: Icon }: { id: typeof currentView, label: string, icon: any }) => (
     <button
       onClick={() => { setCurrentView(id); setSelectedTicker(null); setSidebarOpen(false); }}
-      className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-sm font-bold transition-all relative ${
+      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
         currentView === id && !selectedTicker 
-          ? 'bg-white/10 text-white shadow-[0_0_20px_rgba(255,255,255,0.1)]' 
-          : 'text-slate-400 hover:text-white hover:bg-white/5'
+          ? 'bg-slate-200 dark:bg-zinc-800 text-slate-900 dark:text-white shadow-sm' 
+          : 'text-slate-500 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800/50'
       }`}
     >
-      <Icon size={20} />
+      <Icon size={18} className={currentView === id && !selectedTicker ? 'text-indigo-600 dark:text-indigo-400' : 'opacity-70'} />
       {label}
-      {currentView === id && !selectedTicker && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-1/2 bg-emerald-500 rounded-r-full shadow-[0_0_15px_#10b981]" />}
     </button>
   );
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#0a0a0b] text-slate-200 font-sans">
+    <div className="h-screen w-full flex bg-gray-50 dark:bg-[#09090b] text-slate-900 dark:text-zinc-200 font-sans overflow-hidden transition-colors duration-200">
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} onAdd={handleAddTicker} />
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} onUpdate={handleUpdateProfile} />
+      <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
 
       {/* Mobile Top Nav */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-[#212124] bg-black/80 backdrop-blur-3xl sticky top-0 z-50">
-        <div className="flex items-center gap-3" onClick={() => { setSelectedTicker(null); setCurrentView('dashboard'); }}>
-          <Zap size={24} className="text-emerald-500" fill="currentColor" />
-          <span className="font-black text-xl tracking-tighter text-white">SignalHub</span>
+      <div className="md:hidden fixed top-0 w-full flex items-center justify-between p-4 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 z-50">
+        <div className="flex items-center gap-2" onClick={() => { setSelectedTicker(null); setCurrentView('dashboard'); }}>
+          <Zap size={20} className="text-indigo-600 dark:text-indigo-500 fill-indigo-600 dark:fill-indigo-500" />
+          <span className="font-bold text-lg text-slate-900 dark:text-white">SignalHub</span>
         </div>
         <div className="flex items-center gap-2">
-           <button onClick={() => setIsSearchOpen(true)} className="p-2 bg-white/5 rounded-lg border border-white/10"><Search size={20} /></button>
-           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 bg-white/5 rounded-lg border border-white/10">
+           <button onClick={() => setIsSearchOpen(true)} className="p-2 text-slate-500 dark:text-zinc-400"><Search size={20} /></button>
+           <button onClick={() => setSidebarOpen(!sidebarOpen)} className="p-2 text-slate-500 dark:text-zinc-400">
              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
            </button>
         </div>
@@ -97,82 +107,105 @@ const App: React.FC = () => {
 
       {/* Sidebar Navigation */}
       <aside className={`
-        fixed inset-y-0 left-0 w-80 border-r border-[#212124] flex flex-col z-[60] bg-[#050505] transition-transform duration-300 md:translate-x-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        fixed inset-y-0 left-0 w-72 bg-white dark:bg-[#09090b] border-r border-slate-200 dark:border-[#212124] flex flex-col z-[60] transition-transform duration-300 md:relative md:translate-x-0
+        ${sidebarOpen ? 'translate-x-0 shadow-2xl shadow-black/20' : '-translate-x-full'}
       `}>
-        <div className="p-8">
-          <div className="hidden md:flex items-center gap-4 mb-10 cursor-pointer group" onClick={() => { setSelectedTicker(null); setCurrentView('dashboard'); }}>
-            <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center transition-all group-hover:scale-110">
-               <Zap size={24} className="text-emerald-500" fill="currentColor" />
-            </div>
-            <span className="font-black text-2xl tracking-tighter text-white">SignalHub</span>
+        <div className="p-6">
+          <div className="hidden md:flex items-center gap-3 mb-8 cursor-pointer pl-2" onClick={() => { setSelectedTicker(null); setCurrentView('dashboard'); }}>
+             <div className="w-8 h-8 rounded-lg bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+               <Zap size={16} className="text-white fill-white" />
+             </div>
+             <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">SignalHub</span>
           </div>
 
-          <nav className="space-y-2">
-            <NavItem id="dashboard" label="Signal Terminal" icon={LayoutDashboard} />
+          <div className="mb-4 px-2 text-xs font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Platform</div>
+          <nav className="space-y-1">
+            <NavItem id="dashboard" label="Dashboard" icon={LayoutDashboard} />
             <NavItem id="watchlist" label="Watchlists" icon={List} />
-            <NavItem id="alerts" label="Alert Center" icon={Bell} />
+            <NavItem id="alerts" label="Alerts" icon={Bell} />
+          </nav>
+
+          <div className="mt-8 mb-4 px-2 text-xs font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Intelligence</div>
+          <nav className="space-y-1">
             <NavItem id="contradictions" label="Contradictions" icon={AlertTriangle} />
             <NavItem id="analyse" label="Narrative Engine" icon={MessageSquareText} />
           </nav>
         </div>
 
-        <div className="mt-auto p-8 border-t border-[#212124] space-y-4">
-           <button 
-             onClick={() => { setCurrentView('settings'); setSelectedTicker(null); setSidebarOpen(false); }}
-             className={`w-full flex items-center gap-4 px-5 py-2 text-sm font-bold transition-colors ${currentView === 'settings' ? 'text-white' : 'text-slate-400 hover:text-white'}`}
+        <div className="mt-auto p-4 border-t border-slate-200 dark:border-white/5">
+           <div 
+             onClick={() => setIsProfileOpen(true)}
+             className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800/50 cursor-pointer transition-colors group"
            >
-             <Settings size={20} /> Preferences
-           </button>
-           
-           <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10">
-              <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-emerald-500/20 shadow-xl flex items-center justify-center font-bold text-white text-sm">
+              <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-zinc-800 flex items-center justify-center font-medium text-sm text-slate-600 dark:text-zinc-300 group-hover:bg-slate-300 dark:group-hover:bg-zinc-700 transition-colors">
                 {user.firstName?.[0] || 'U'}
               </div>
               <div className="flex-1 min-w-0">
-                 <div className="text-sm font-black truncate text-white">{user.firstName || 'User'}</div>
-                 <div className="text-[9px] text-slate-500 font-black uppercase tracking-widest flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
-                 </div>
+                 <div className="text-sm font-medium text-slate-900 dark:text-white truncate">{user.firstName || 'User'}</div>
+                 <div className="text-xs text-slate-500 dark:text-zinc-500 truncate">{user.email}</div>
               </div>
-              <button onClick={logout} className="text-slate-500 hover:text-white"><LogOut size={16} /></button>
+              <button 
+                onClick={(e) => { e.stopPropagation(); logout(); }} 
+                className="text-slate-400 hover:text-slate-900 dark:text-zinc-600 dark:hover:text-white transition-colors"
+                title="Log Out"
+              >
+                <LogOut size={16} />
+              </button>
+           </div>
+           
+           <div className="flex items-center gap-1 mt-2">
+             <button 
+               onClick={() => { setCurrentView('settings'); setSelectedTicker(null); setSidebarOpen(false); }}
+               className="flex-1 flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-500 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-zinc-300 transition-colors"
+             >
+               <Settings size={14} /> Settings
+             </button>
+             <div className="w-px h-4 bg-slate-200 dark:bg-zinc-800"></div>
+             <button 
+               onClick={() => setIsHelpOpen(true)}
+               className="flex-1 flex items-center gap-2 px-3 py-2 text-xs font-medium text-slate-500 dark:text-zinc-500 hover:text-slate-900 dark:hover:text-zinc-300 transition-colors"
+             >
+               <HelpCircle size={14} /> Help
+             </button>
            </div>
         </div>
       </aside>
 
       {/* Content Canvas */}
-      <main className="flex-1 md:ml-80 p-4 md:p-8 lg:p-12 overflow-x-hidden relative min-h-screen">
-        <div className="max-w-7xl mx-auto">
-          {selectedTicker ? (
-            <TickerDetail ticker={selectedTicker} onBack={() => setSelectedTicker(null)} />
-          ) : currentView === 'dashboard' ? (
-            <DashboardView onSelectTicker={setSelectedTicker} onOpenSearch={() => setIsSearchOpen(true)} />
-          ) : currentView === 'watchlist' ? (
-            <WatchlistView onSelectTicker={setSelectedTicker} />
-          ) : currentView === 'alerts' ? (
-            <AlertsView />
-          ) : currentView === 'contradictions' ? (
-            <ContradictionView />
-          ) : currentView === 'analyse' ? (
-            <NLPView />
-          ) : currentView === 'settings' ? (
-            <SettingsView user={user} onLogout={logout} />
-          ) : (
-             <div className="h-[60vh] flex flex-col items-center justify-center text-center gap-6 animate-in fade-in duration-1000">
-               <Activity className="text-white/10 animate-pulse" size={120} />
-               <h2 className="text-3xl font-black uppercase tracking-[0.5em] opacity-20 text-white">Quant Node Initializing</h2>
-             </div>
-          )}
+      <main className="flex-1 h-full overflow-hidden flex flex-col relative pt-16 md:pt-0">
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto">
+          <div className="max-w-[1600px] mx-auto h-full flex flex-col">
+            {selectedTicker ? (
+              <TickerDetail ticker={selectedTicker} onBack={() => setSelectedTicker(null)} />
+            ) : currentView === 'dashboard' ? (
+              <DashboardView onSelectTicker={setSelectedTicker} onOpenSearch={() => setIsSearchOpen(true)} />
+            ) : currentView === 'watchlist' ? (
+              <WatchlistView onSelectTicker={setSelectedTicker} />
+            ) : currentView === 'alerts' ? (
+              <AlertsView />
+            ) : currentView === 'contradictions' ? (
+              <ContradictionView />
+            ) : currentView === 'analyse' ? (
+              <NLPView />
+            ) : currentView === 'settings' ? (
+              <SettingsView user={user} onLogout={logout} />
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center gap-6 animate-in fade-in duration-1000">
+                <Activity className="text-slate-300 dark:text-zinc-800" size={80} />
+                <h2 className="text-xl font-medium text-slate-400 dark:text-zinc-500">System Initializing...</h2>
+              </div>
+            )}
+          </div>
         </div>
       </main>
 
       {/* Desktop Search FAB */}
-      <div className="hidden md:block fixed bottom-10 right-10 z-[70]">
+      <div className="hidden md:block fixed bottom-8 right-8 z-[70]">
         <button 
           onClick={() => setIsSearchOpen(true)}
-          className="w-14 h-14 rounded-full bg-white text-black flex items-center justify-center shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:scale-110 active:scale-95 transition-all ring-8 ring-[#0a0a0b]"
+          className="w-12 h-12 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all ring-4 ring-white dark:ring-[#09090b]"
         >
-          <Search size={24} strokeWidth={3} />
+          <Search size={20} strokeWidth={2.5} />
         </button>
       </div>
     </div>

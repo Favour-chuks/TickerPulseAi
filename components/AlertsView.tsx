@@ -33,34 +33,34 @@ const AlertsView: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-white">Alert Center</h1>
-        <p className="text-slate-400 text-sm">Chronological log of all high-frequency signals and corporate narrative anomalies.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Alert Center</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-sm">Chronological log of all high-frequency signals and corporate narrative anomalies.</p>
       </header>
 
       <div className="space-y-4">
         {alerts.map(alert => (
           <Card key={alert.id} className={`border-l-4 ${
-            alert.priority === 'critical' ? 'border-l-rose-500 bg-rose-500/5' : 
+            alert.priority === 'critical' ? 'border-l-rose-500 bg-rose-50 dark:bg-rose-500/5' : 
             alert.priority === 'high' ? 'border-l-amber-500' : 'border-l-sky-500'
           }`}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
-                     {alert.alert_type === 'spike' ? <Zap className="text-emerald-500" size={24} /> : <AlertTriangle className="text-amber-500" size={24} />}
+                  <div className="w-12 h-12 rounded-xl bg-white dark:bg-white/5 flex items-center justify-center shrink-0 border border-slate-200 dark:border-white/10">
+                     {alert.alert_type === 'spike' ? <Zap className="text-emerald-600 dark:text-emerald-500" size={24} /> : <AlertTriangle className="text-amber-500" size={24} />}
                   </div>
                   <div className="space-y-1">
                      <div className="flex items-center gap-3">
-                        <span className="font-mono font-extrabold text-lg text-white">{alert.symbol}</span>
+                        <span className="font-mono font-extrabold text-lg text-slate-900 dark:text-white">{alert.symbol}</span>
                         <Badge variant={alert.priority === 'critical' ? 'danger' : 'default'}>{alert.priority}</Badge>
                         <span className="text-[10px] text-slate-500 font-bold tracking-widest uppercase">{alert.alert_type}</span>
                      </div>
-                     <p className="text-sm text-slate-300 leading-relaxed">{alert.message}</p>
-                     <p className="text-[10px] text-slate-500 font-mono">{new Date(alert.created_at).toLocaleString()}</p>
+                     <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{alert.message}</p>
+                     <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">{new Date(alert.created_at).toLocaleString()}</p>
                   </div>
                </div>
                <button 
                 onClick={() => handleDismiss(alert.id)}
-                className="px-4 py-2 text-xs font-bold border border-[#212124] rounded-lg hover:bg-white/5 whitespace-nowrap text-slate-400"
+                className="px-4 py-2 text-xs font-bold border border-slate-200 dark:border-[#212124] rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 whitespace-nowrap text-slate-500 dark:text-slate-400"
                >
                  Dismiss
                </button>
@@ -68,7 +68,7 @@ const AlertsView: React.FC = () => {
           </Card>
         ))}
         {alerts.length === 0 && (
-           <div className="p-20 text-center border-2 border-dashed border-[#212124] rounded-3xl opacity-50 text-slate-500">
+           <div className="p-20 text-center border-2 border-dashed border-slate-200 dark:border-[#212124] rounded-3xl opacity-50 text-slate-400 dark:text-slate-500">
              <BellRing size={48} className="mx-auto mb-4" />
              <p className="font-bold">Clear Skies</p>
              <p className="text-xs">No active anomalies detected in the current monitoring window.</p>

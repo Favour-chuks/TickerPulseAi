@@ -18,9 +18,24 @@ export class NotificationService {
     return false;
   }
 
-  static sendNotification(title: string, body: string, icon?: string) {
+  static async sendNotification(title: string, body: string, icon?: string) {
     if (Notification.permission === 'granted') {
       try {
+        // Try to use Service Worker registration first (required for Android/PWA)
+        if ('serviceWorker' in navigator) {
+          const registration = await navigator.serviceWorker.ready;
+          if (registration) {
+            registration.showNotification(title, {
+              body,
+              icon: icon || '/favicon.ico',
+              tag: 'signalhub-alert',
+              vibrate: [200, 100, 200]
+            } as any);
+            return;
+          }
+        }
+
+        // Fallback to standard API
         new Notification(title, {
           body,
           icon: icon || '/favicon.ico',

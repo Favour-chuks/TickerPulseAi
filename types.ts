@@ -1,3 +1,4 @@
+
 export enum View {
   DASHBOARD = 'DASHBOARD',
   WATCHLIST = 'WATCHLIST',
@@ -52,12 +53,20 @@ export interface Narrative {
 export interface Contradiction {
   id: number;
   tickerSymbol: string;
-  type: string;
+  contradiction_type: string; // Matches DB schema
   explanation: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  quote1: string;
-  quote2: string;
-  detectedAt: string;
+  quote_1: string;
+  quote_2: string;
+  news_headline?: string;
+  market_trend_before?: string; // 'bullish', 'bearish', 'neutral'
+  market_trend_after?: string;
+  price_impact?: number;
+  volume_impact?: number;
+  gemini_confidence?: number;
+  is_validated: boolean;
+  validation_notes?: string;
+  detected_at: string;
 }
 
 export interface Message {

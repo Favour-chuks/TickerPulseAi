@@ -1,5 +1,5 @@
 
-import { Ticker, MarketData, Narrative, PromiseRecord, Contradiction, Alert, Watchlist, Message } from '../types';
+import { Ticker, MarketData, Narrative, PromiseRecord, Contradiction, Alert, Watchlist, Message, User, VolumeSpike } from '../types';
 
 const API_BASE_URL = 'http://localhost:5000/api/v1';
 
@@ -57,6 +57,19 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ email, password, firstName, lastName }),
       });
+    },
+    updateProfile: async (data: Partial<User> & { password?: string, avatarUrl?: string }) => {
+      return fetchWithAuth('/users/me', {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      });
+    },
+    requestPasswordReset: async (email: string) => {
+      // return fetchWithAuth('/auth/forgot-password', {
+      //   method: 'POST',
+      //   body: JSON.stringify({ email }),
+      // });
+      return new Promise(resolve => setTimeout(resolve, 1000)); // Mock success
     },
     logout: () => {
       localStorage.removeItem('auth_token');
@@ -153,11 +166,25 @@ export const api = {
     getData: async (symbol: string): Promise<MarketData[]> => {
       return generateMockMarketData();
     },
+    getSpikes: async (): Promise<VolumeSpike[]> => {
+      try {
+        const res = await fetchWithAuth('/volume-spikes');
+        return res.spikes || [];
+      } catch (e) {
+        return [];
+      }
+    },
     search: async (query: string): Promise<Ticker[]> => {
       // Mock search
       return [
         { id: 1, symbol: query.toUpperCase(), companyName: `${query.toUpperCase()} Corp`, sector: 'Technology' }
       ];
+    },
+    requestTicker: async (symbol: string): Promise<{success: boolean, message: string}> => {
+      // Mock request
+      return new Promise(resolve => setTimeout(() => resolve({ success: true, message: 'Request submitted' }), 500));
+      // In real implementation:
+      // return fetchWithAuth('/requests/ticker', { method: 'POST', body: JSON.stringify({ symbol }) });
     }
   },
 
@@ -178,7 +205,25 @@ export const api = {
       ];
     },
     getContradictions: async (symbol: string): Promise<Contradiction[]> => {
-      return [];
+      return [
+        {
+          id: 1,
+          tickerSymbol: symbol,
+          contradiction_type: 'guidance_miss',
+          explanation: "Management committed to 20% margin but delivered 12%.",
+          severity: 'high',
+          quote_1: "We are confident in 20% margins.",
+          quote_2: "Margins compressed to 12% due to supply chain.",
+          detected_at: new Date().toISOString(),
+          market_trend_before: 'bullish',
+          market_trend_after: 'bearish',
+          price_impact: -5.2,
+          volume_impact: 1.8,
+          gemini_confidence: 0.88,
+          is_validated: false,
+          news_headline: `${symbol} Misses Margin Targets`
+        }
+      ];
     }
   },
 
