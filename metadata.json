@@ -1,0 +1,7 @@
+{
+  "name": "TickerPulseAi",
+  "description": "Real-time narrative detection engine analyzing volume spikes, SEC filings, and market contradictions using Gemini AI.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
