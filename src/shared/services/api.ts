@@ -14,11 +14,9 @@ export class ApiError extends Error {
 async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   // Offline Check
   if (!navigator.onLine) {
-    // If it's a mutation, queue it for later
     if (options.method && ['POST', 'PUT', 'DELETE', 'PATCH'].includes(options.method.toUpperCase())) {
        SyncService.queueRequest(endpoint, options);
     }
-    // Throw error so the calling function can handle the fallback to local mock data
     throw new Error('Offline');
   }
 
@@ -46,7 +44,7 @@ async function fetchWithAuth(endpoint: string, options: RequestInit = {}) {
   return response.json();
 }
 
-// Mock Data Store for Fallback Mode with LocalStorage Persistence
+// Mock Data Store
 const loadMockWatchlists = (): Watchlist[] => {
   try {
     const saved = localStorage.getItem('mock_watchlists');
@@ -100,7 +98,7 @@ export const api = {
         return await fetchWithAuth('/watchlist');
       } catch (e) {
         console.warn('API unavailable, utilizing local mock watchlists');
-        MOCK_WATCHLISTS = loadMockWatchlists(); // Refresh from storage
+        MOCK_WATCHLISTS = loadMockWatchlists();
         return { count: MOCK_WATCHLISTS.length, watchlists: [...MOCK_WATCHLISTS] };
       }
     },
@@ -279,7 +277,6 @@ export const api = {
       try {
         return await fetchWithAuth('/narratives');
       } catch (e) {
-        // Mock fallback if API fails
         return [
            { 
             id: 1, 

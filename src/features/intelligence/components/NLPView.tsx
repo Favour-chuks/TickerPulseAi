@@ -1,8 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react';
-import { api } from '../services/api';
-import { Message } from '../types';
+import { api } from '../../../shared/services/api';
+import { Message } from '../../../shared/types';
 
 const NLPView: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -63,7 +63,6 @@ const NLPView: React.FC = () => {
 
   return (
     <div className="h-full flex flex-col bg-white dark:bg-[#18181b] rounded-2xl overflow-hidden animate-in fade-in duration-500 shadow-sm border border-slate-200 dark:border-none">
-      {/* Header */}
       <div className="px-6 py-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-[#18181b] shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center">
@@ -79,7 +78,6 @@ const NLPView: React.FC = () => {
         </div>
       </div>
 
-      {/* Messages */}
       <div 
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 md:p-6 space-y-8 scroll-smooth"
@@ -120,7 +118,6 @@ const NLPView: React.FC = () => {
         )}
       </div>
 
-      {/* Input */}
       <div className="p-4 bg-white dark:bg-[#18181b] border-t border-slate-200 dark:border-white/5 shrink-0">
         <div className="bg-slate-100 dark:bg-[#27272a] rounded-xl p-2 flex items-center gap-2 transition-colors">
           <input 

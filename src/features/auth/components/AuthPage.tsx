@@ -35,7 +35,6 @@ const AuthPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] dark:bg-[#0a0a0b] flex items-center justify-center p-4 relative overflow-hidden transition-colors duration-500">
-      {/* Background Ambience - Adapted for Light/Dark */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brand-200/40 dark:bg-brand-500/10 blur-[120px] rounded-full mix-blend-multiply dark:mix-blend-normal"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-200/40 dark:bg-indigo-500/10 blur-[120px] rounded-full mix-blend-multiply dark:mix-blend-normal"></div>
@@ -44,7 +43,6 @@ const AuthPage: React.FC = () => {
       <div className="w-full max-w-md z-10 animate-in fade-in zoom-in-95 duration-500">
         <div className="bg-white/80 dark:bg-[#121214] border border-white/50 dark:border-[#212124] p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-2xl backdrop-blur-xl">
           
-          {/* Header Hierarchy */}
           <div className="flex flex-col items-center mb-8">
             <div className="w-14 h-14 bg-brand-600 dark:bg-brand-600 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/20 mb-5">
               <Zap size={28} className="text-white fill-white" />
@@ -226,7 +224,6 @@ const AuthPage: React.FC = () => {
           </div>
         </div>
         
-        {/* Footer info */}
         <div className="mt-8 text-center">
           <p className="text-xs text-slate-400 dark:text-slate-600 font-medium">
             Protected by enterprise-grade encryption.

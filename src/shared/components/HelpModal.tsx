@@ -16,8 +16,6 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/20 dark:bg-black/80 backdrop-blur-sm transition-opacity" onClick={onClose} />
       <div className="w-full max-w-2xl bg-white dark:bg-[#18181b] border border-slate-200 dark:border-[#2d2d31] rounded-2xl shadow-2xl relative z-10 animate-in fade-in zoom-in-95 duration-200 overflow-hidden flex flex-col max-h-[85vh]">
-        
-        {/* Header */}
         <div className="p-6 border-b border-slate-200 dark:border-[#2d2d31] flex items-center justify-between bg-white dark:bg-[#18181b]">
           <div className="flex items-center gap-3">
              <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -33,7 +31,6 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Tabs */}
         <div className="flex border-b border-slate-200 dark:border-[#2d2d31] bg-slate-50/50 dark:bg-white/5">
           <button 
             onClick={() => setActiveTab('metrics')}
@@ -55,7 +52,6 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white dark:bg-[#18181b]">
           {activeTab === 'metrics' && (
             <div className="space-y-8">

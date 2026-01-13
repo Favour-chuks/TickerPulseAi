@@ -17,23 +17,25 @@ import {
   ChevronUp,
   User as UserIcon
 } from 'lucide-react';
-import DashboardView from './components/DashboardView';
-import WatchlistView from './components/WatchlistView';
-import NLPView from './components/NLPView';
-import AlertsView from './components/AlertsView';
-import SettingsView from './components/SettingsView';
-import ContradictionView from './components/ContradictionView';
-import AuthPage from './components/AuthPage';
-import TickerDetail from './components/TickerDetail';
-import { SearchModal } from './components/SearchModal';
-import { HelpModal } from './components/HelpModal';
-import { ConnectionBanner } from './components/ConnectionBanner';
-import { useAuthStore } from './store/authStore';
-import { useConnectionStore } from './store/connectionStore';
-import { NotificationService } from './services/notifications';
-import { SyncService } from './services/syncService';
-import { api } from './services/api';
-import { Ticker, User } from './types';
+
+import DashboardView from './features/dashboard/components/DashboardView';
+import WatchlistView from './features/watchlist/components/WatchlistView';
+import NLPView from './features/intelligence/components/NLPView';
+import AlertsView from './features/alerts/components/AlertsView';
+import SettingsView from './features/settings/components/SettingsView';
+import ContradictionView from './features/intelligence/components/ContradictionView';
+import AuthPage from './features/auth/components/AuthPage';
+import TickerDetail from './features/market/components/TickerDetail';
+import { SearchModal } from './features/market/components/SearchModal';
+
+import { HelpModal } from './shared/components/HelpModal';
+import { ConnectionBanner } from './shared/components/ConnectionBanner';
+import { useAuthStore } from './features/auth/store/authStore';
+import { useConnectionStore } from './shared/store/connectionStore';
+import { NotificationService } from './shared/services/notifications';
+import { SyncService } from './shared/services/syncService';
+import { api } from './shared/services/api';
+import { Ticker, User } from './shared/types';
 
 const App: React.FC = () => {
   const { user, isAuthenticated, initialize, logout } = useAuthStore();
@@ -50,7 +52,6 @@ const App: React.FC = () => {
   useEffect(() => {
     initialize();
 
-    // Connection Monitoring
     const handleOnline = () => {
       setOnline(true);
       setSocketConnected(true);
@@ -68,7 +69,6 @@ const App: React.FC = () => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
     
-    // Initial check
     if (!navigator.onLine) setOnline(false);
 
     return () => {
@@ -160,7 +160,7 @@ const App: React.FC = () => {
         <div className="md:hidden fixed top-0 w-full flex items-center justify-between p-4 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 z-50 mt-[32px] md:mt-0">
           <div className="flex items-center gap-2" onClick={() => { setSelectedTicker(null); setCurrentView('dashboard'); }}>
             <Zap size={20} className="text-brand-600 dark:text-brand-500 fill-brand-600 dark:fill-brand-500" />
-            <span className="font-bold text-lg text-slate-900 dark:text-white">SignalHub</span>
+            <span className="font-bold text-lg text-slate-900 dark:text-white">TickerPulse</span>
           </div>
           <div className="flex items-center gap-2">
              <button onClick={() => setIsSearchOpen(true)} className="p-2 text-slate-500 dark:text-zinc-400"><Search size={20} /></button>
@@ -172,7 +172,7 @@ const App: React.FC = () => {
 
         {/* Sidebar Navigation */}
         <aside className={`
-          fixed inset-y-0 left-0 w-72 bg-white/50 dark:bg-[#09090b] backdrop-blur-xl border-r border-slate-200 dark:border-[#212124] flex flex-col z-[60] transition-transform duration-300 md:relative md:translate-x-0
+          fixed inset-y-0 left-0 w-72 bg-white/50 dark:bg-[#09090b] backdrop-blur-xl border-r border-slate-200 dark:border-[#212124] flex flex-col z-[60] transition-transform duration-300 md:relative md:translate-x-0 md:h-full overflow-y-auto custom-scrollbar
           ${sidebarOpen ? 'translate-x-0 shadow-2xl shadow-black/20' : '-translate-x-full'}
         `}>
           <div className="p-6">
@@ -180,7 +180,7 @@ const App: React.FC = () => {
                <div className="w-8 h-8 rounded-lg bg-brand-600 dark:bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
                  <Zap size={16} className="text-white fill-white" />
                </div>
-               <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">SignalHub</span>
+               <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">TickerPulse</span>
             </div>
 
             <div className="mb-4 px-2 text-xs font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Platform</div>
@@ -257,7 +257,6 @@ const App: React.FC = () => {
           </div>
         </aside>
 
-        {/* Content Canvas */}
         <main className="flex-1 h-full overflow-hidden flex flex-col relative pt-16 md:pt-0">
           <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
             <div className="max-w-[1600px] mx-auto h-full flex flex-col">
@@ -291,7 +290,6 @@ const App: React.FC = () => {
           </div>
         </main>
 
-        {/* Desktop Search FAB */}
         <div className="hidden md:block fixed bottom-8 right-8 z-[70]">
           <button 
             onClick={() => setIsSearchOpen(true)}

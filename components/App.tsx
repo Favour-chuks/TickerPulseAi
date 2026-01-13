@@ -160,7 +160,7 @@ const App: React.FC = () => {
         <div className="md:hidden fixed top-0 w-full flex items-center justify-between p-4 bg-white/80 dark:bg-[#09090b]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 z-50 mt-[32px] md:mt-0">
           <div className="flex items-center gap-2" onClick={() => { setSelectedTicker(null); setCurrentView('dashboard'); }}>
             <Zap size={20} className="text-brand-600 dark:text-brand-500 fill-brand-600 dark:fill-brand-500" />
-            <span className="font-bold text-lg text-slate-900 dark:text-white">SignalHub</span>
+            <span className="font-bold text-lg text-slate-900 dark:text-white">TickerPulse</span>
           </div>
           <div className="flex items-center gap-2">
              <button onClick={() => setIsSearchOpen(true)} className="p-2 text-slate-500 dark:text-zinc-400"><Search size={20} /></button>
@@ -180,7 +180,7 @@ const App: React.FC = () => {
                <div className="w-8 h-8 rounded-lg bg-brand-600 dark:bg-brand-600 flex items-center justify-center shadow-lg shadow-brand-500/20 group-hover:scale-105 transition-transform">
                  <Zap size={16} className="text-white fill-white" />
                </div>
-               <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">SignalHub</span>
+               <span className="font-bold text-lg text-slate-900 dark:text-white tracking-tight">TickerPulse</span>
             </div>
 
             <div className="mb-4 px-2 text-xs font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-wider">Platform</div>

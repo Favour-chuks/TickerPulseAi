@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Zap, Settings, Loader2, LogOut, ArrowLeft, User, Mail, Camera, Lock, Save, CheckCircle2 } from 'lucide-react';
-import { Card, Badge } from './Shared';
-import { api } from '../services/api';
-import { NotificationService } from '../services/notifications';
-import { User as UserType } from '../types';
+import { Card, Badge } from '../../../shared/components/Shared';
+import { api } from '../../../shared/services/api';
+import { NotificationService } from '../../../shared/services/notifications';
+import { User as UserType } from '../../../shared/types';
 
 interface SettingsViewProps {
   user: UserType;
@@ -18,7 +18,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
   const [simulating, setSimulating] = useState(false);
   const [autoScan, setAutoScan] = useState(true);
 
-  // Profile Form State
   const [firstName, setFirstName] = useState(user.firstName || '');
   const [lastName, setLastName] = useState(user.lastName || '');
   const [password, setPassword] = useState('');
@@ -28,7 +27,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Sync state if user prop updates from elsewhere
   useEffect(() => {
     setFirstName(user.firstName || '');
     setLastName(user.lastName || '');
@@ -73,7 +71,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
       setPassword('');
       setConfirmPassword('');
       
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (e: any) {
       console.error(e);
@@ -91,7 +88,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
     }
   };
 
-  // --- RENDER: PROFILE EDIT VIEW ---
   if (section === 'profile') {
     return (
       <div className="space-y-6 animate-in slide-in-from-right-4 duration-500 pb-20">
@@ -124,7 +120,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
              )}
 
              <div className="flex flex-col md:flex-row gap-8">
-               {/* Avatar Column */}
                <div className="flex flex-col items-center space-y-4">
                   <div className="relative group cursor-pointer">
                     <div className="w-32 h-32 rounded-full bg-slate-100 dark:bg-slate-800 border-4 border-white dark:border-[#212124] shadow-xl overflow-hidden flex items-center justify-center">
@@ -142,7 +137,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
                   <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Profile Photo</p>
                </div>
 
-               {/* Fields Column */}
                <div className="flex-1 space-y-6">
                  <div className="space-y-2">
                    <label className="text-xs font-bold text-slate-400 uppercase flex items-center gap-2">
@@ -229,7 +223,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
     );
   }
 
-  // --- RENDER: MAIN SETTINGS VIEW ---
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <header>
