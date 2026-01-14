@@ -62,8 +62,8 @@ const NLPView: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-[#18181b] rounded-2xl overflow-hidden animate-in fade-in duration-500 shadow-sm border border-slate-200 dark:border-none">
-      <div className="px-6 py-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-[#18181b] shrink-0">
+    <div className="h-full flex flex-col bg-white dark:bg-[#18181b] md:rounded-2xl rounded-none overflow-hidden animate-in fade-in duration-500 shadow-sm md:border border-slate-200 dark:border-[#2d2d31]">
+      <div className="px-4 md:px-6 py-4 border-b border-slate-200 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-[#18181b] shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
@@ -118,20 +118,20 @@ const NLPView: React.FC = () => {
         )}
       </div>
 
-      <div className="p-4 bg-white dark:bg-[#18181b] border-t border-slate-200 dark:border-white/5 shrink-0">
+      <div className="p-4 bg-white dark:bg-[#18181b] border-t border-slate-200 dark:border-white/5 shrink-0 pb-safe">
         <div className="bg-slate-100 dark:bg-[#27272a] rounded-xl p-2 flex items-center gap-2 transition-colors">
           <input 
             type="text" 
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Analyze volume spikes, contradictions, or ticker comparisons..." 
-            className="flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-sm text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-zinc-500 px-3"
+            placeholder="Analyze volume spikes, contradictions..." 
+            className="flex-1 min-w-0 bg-transparent border-none focus:ring-0 text-sm text-slate-900 dark:text-white placeholder:text-slate-500 dark:placeholder:text-zinc-500 px-3 h-10"
           />
           <button 
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="flex-shrink-0 bg-white dark:bg-zinc-100 hover:bg-slate-50 dark:hover:bg-white text-slate-900 dark:text-black p-2 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            className="flex-shrink-0 bg-white dark:bg-zinc-100 hover:bg-slate-50 dark:hover:bg-white text-slate-900 dark:text-black p-2.5 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             <Send className="w-4 h-4" />
           </button>

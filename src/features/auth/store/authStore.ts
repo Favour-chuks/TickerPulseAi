@@ -14,6 +14,7 @@ interface AuthState {
   loginWithGoogle: () => Promise<void>;
   register: (email: string, password: string, firstName: string, lastName: string) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
   logout: () => void;
   initialize: () => void;
 }
@@ -130,6 +131,27 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (error: any) {
       set({ 
         error: error.message || 'Reset request failed', 
+        isLoading: false 
+      });
+      throw error;
+    }
+  },
+
+  deleteAccount: async (password: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      await api.auth.deleteAccount(password);
+      api.auth.logout();
+      localStorage.removeItem('auth_user');
+      set({ 
+        token: null, 
+        user: null, 
+        isAuthenticated: false, 
+        isLoading: false 
+      });
+    } catch (error: any) {
+      set({ 
+        error: error.message || 'Account deletion failed', 
         isLoading: false 
       });
       throw error;

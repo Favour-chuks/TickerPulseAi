@@ -148,6 +148,9 @@ const App: React.FC = () => {
     </button>
   );
 
+  // Helper to determine if we should remove padding/scroll for full-screen apps like Chat
+  const isChatView = currentView === 'analyse' && !selectedTicker;
+
   return (
     <div className="h-screen w-full flex flex-col bg-transparent text-slate-900 dark:text-zinc-200 font-sans overflow-hidden transition-colors duration-200 selection:bg-brand-500/20">
       <ConnectionBanner />
@@ -257,8 +260,10 @@ const App: React.FC = () => {
           </div>
         </aside>
 
+        {/* Content Canvas */}
         <main className="flex-1 h-full overflow-hidden flex flex-col relative pt-16 md:pt-0">
-          <div className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
+          {/* Conditional padding and overflow based on view type */}
+          <div className={`flex-1 ${isChatView ? 'p-0 md:p-6 lg:p-8 overflow-hidden' : 'p-4 md:p-6 lg:p-8 overflow-y-auto custom-scrollbar'}`}>
             <div className="max-w-[1600px] mx-auto h-full flex flex-col">
               {selectedTicker ? (
                 <TickerDetail ticker={selectedTicker} onBack={() => setSelectedTicker(null)} />
@@ -290,14 +295,17 @@ const App: React.FC = () => {
           </div>
         </main>
 
-        <div className="hidden md:block fixed bottom-8 right-8 z-[70]">
-          <button 
-            onClick={() => setIsSearchOpen(true)}
-            className="w-12 h-12 rounded-2xl bg-brand-600 dark:bg-white text-white dark:text-black flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all ring-4 ring-white dark:ring-[#09090b]"
-          >
-            <Search size={20} strokeWidth={2.5} />
-          </button>
-        </div>
+        {/* Desktop Search FAB - Hidden on Chat View */}
+        {!isChatView && (
+          <div className="hidden md:block fixed bottom-8 right-8 z-[70]">
+            <button 
+              onClick={() => setIsSearchOpen(true)}
+              className="w-12 h-12 rounded-2xl bg-brand-600 dark:bg-white text-white dark:text-black flex items-center justify-center shadow-2xl hover:scale-105 active:scale-95 transition-all ring-4 ring-white dark:ring-[#09090b]"
+            >
+              <Search size={20} strokeWidth={2.5} />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

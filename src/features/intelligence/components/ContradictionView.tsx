@@ -126,19 +126,20 @@ const ContradictionCard: React.FC<ContradictionCardProps> = ({ data, onAddToWatc
             </div>
 
             <div className="flex items-center gap-2 self-end sm:self-auto">
-               {validated ? (
+               {validated && (
                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs font-bold border border-emerald-100 dark:border-emerald-500/20">
                    <CheckCircle2 size={14} /> Validated
                  </div>
-               ) : (
-                 <button 
-                   onClick={handleAdd}
-                   className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-                   title="Add to Watchlist"
-                 >
-                   <Plus size={20} />
-                 </button>
                )}
+               
+               <button 
+                 onClick={handleAdd}
+                 className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                 title="Add to Watchlist"
+               >
+                 <Plus size={20} />
+               </button>
+
                <button className={`p-2 transition-transform duration-300 text-slate-400 ${expanded ? 'rotate-180' : ''}`}>
                  <ChevronDown size={20} />
                </button>

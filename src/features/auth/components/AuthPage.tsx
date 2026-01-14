@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Zap, ArrowRight, Loader2, Lock, Mail, User, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Zap, ArrowRight, Loader2, Lock, Mail, User, ArrowLeft, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
 const AuthPage: React.FC = () => {
@@ -10,6 +10,7 @@ const AuthPage: React.FC = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [resetSent, setResetSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const { login, loginWithGoogle, register, resetPassword, isLoading, error } = useAuthStore();
 
@@ -119,13 +120,20 @@ const AuthPage: React.FC = () => {
                 <div className="relative group">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500 transition-colors group-focus-within:text-brand-500" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-[#1c1c1f] border border-slate-200 dark:border-[#2d2d31] rounded-xl pl-10 pr-4 py-3 text-sm text-slate-900 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all placeholder:text-slate-400"
+                    className="w-full bg-slate-50 dark:bg-[#1c1c1f] border border-slate-200 dark:border-[#2d2d31] rounded-xl pl-10 pr-10 py-3 text-sm text-slate-900 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition-all placeholder:text-slate-400"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors z-10 p-1"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
                 </div>
               )}
 

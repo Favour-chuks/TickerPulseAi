@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Zap, Settings, Loader2, LogOut, ArrowLeft, User, Mail, Camera, Lock, Save, CheckCircle2 } from 'lucide-react';
-import { Card, Badge } from '../../../shared/components/Shared';
+import { RefreshCw, Zap, Settings, Loader2, LogOut, ArrowLeft, User, Mail, Camera, Lock, Save, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Card, Badge, SecurityModal } from '../../../shared/components/Shared';
 import { api } from '../../../shared/services/api';
 import { NotificationService } from '../../../shared/services/notifications';
 import { User as UserType } from '../../../shared/types';
+import { useAuthStore } from '../../auth/store/authStore';
 
 interface SettingsViewProps {
   user: UserType;
@@ -17,6 +18,7 @@ interface SettingsViewProps {
 const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, onSectionChange, onUpdateProfile }) => {
   const [simulating, setSimulating] = useState(false);
   const [autoScan, setAutoScan] = useState(true);
+  const { deleteAccount } = useAuthStore();
 
   const [firstName, setFirstName] = useState(user.firstName || '');
   const [lastName, setLastName] = useState(user.lastName || '');
@@ -26,6 +28,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Security Modal State
+  const [securityModalOpen, setSecurityModalOpen] = useState(false);
+  const [securityModalType, setSecurityModalType] = useState<'basic' | 'sensitive' | 'delete'>('basic');
+  const [securityModalAction, setSecurityModalAction] = useState<'update' | 'delete'>('update');
 
   useEffect(() => {
     setFirstName(user.firstName || '');
@@ -49,7 +58,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
     }
   };
 
-  const handleSaveProfile = async (e: React.FormEvent) => {
+  // Step 1: Initiate Save (Open Modal)
+  const handleInitSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
@@ -59,22 +69,53 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
       return;
     }
 
+    setSecurityModalAction('update');
+    // Determine type of change
+    if (password) {
+      setSecurityModalType('sensitive');
+    } else {
+      setSecurityModalType('basic');
+    }
+    
+    setSecurityModalOpen(true);
+  };
+
+  const handleInitDelete = () => {
+    setError('');
+    setSecurityModalAction('delete');
+    setSecurityModalType('delete');
+    setSecurityModalOpen(true);
+  };
+
+  // Step 2: Confirm & Execute
+  const handleConfirmAction = async (currentPassword?: string) => {
     setLoading(true);
     try {
+      if (securityModalAction === 'delete') {
+        if (!currentPassword) throw new Error("Password required");
+        await deleteAccount(currentPassword);
+        // Auth store handles logout/redirect
+        setSecurityModalOpen(false);
+        return;
+      }
+
       const payload: any = { firstName, lastName };
       if (password) payload.password = password;
       if (avatarUrl) payload.avatarUrl = avatarUrl;
+      if (currentPassword) payload.currentPassword = currentPassword;
 
       await api.auth.updateProfile(payload);
       onUpdateProfile({ ...user, ...payload });
       setSuccessMsg("Profile updated successfully");
       setPassword('');
       setConfirmPassword('');
+      setSecurityModalOpen(false);
       
       setTimeout(() => setSuccessMsg(''), 3000);
     } catch (e: any) {
       console.error(e);
-      setError(e.message || "Failed to update profile");
+      setError(e.message || "Failed to perform action");
+      setSecurityModalOpen(false);
     } finally {
       setLoading(false);
     }
@@ -91,6 +132,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
   if (section === 'profile') {
     return (
       <div className="space-y-6 animate-in slide-in-from-right-4 duration-500 pb-20">
+        <SecurityModal 
+          isOpen={securityModalOpen}
+          type={securityModalType}
+          onClose={() => { setSecurityModalOpen(false); setLoading(false); }}
+          onConfirm={handleConfirmAction}
+          isLoading={loading}
+        />
+
         <button
           onClick={() => onSectionChange('main')}
           className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors text-sm font-bold group"
@@ -104,7 +153,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
         </header>
 
         <Card className="max-w-3xl">
-          <form onSubmit={handleSaveProfile} className="space-y-8 p-2">
+          <form onSubmit={handleInitSave} className="space-y-8 p-2">
              {error && (
                <div className="p-4 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-600 dark:text-rose-400 text-sm font-bold rounded-xl flex items-center gap-2">
                  <div className="w-2 h-2 rounded-full bg-rose-500" />
@@ -176,25 +225,43 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
                      <Lock size={16} className="text-brand-500" /> Security
                    </h3>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
+                      <div className="space-y-2 relative">
                          <label className="text-xs font-bold text-slate-400 uppercase">New Password</label>
-                         <input 
-                           type="password"
-                           value={password}
-                           onChange={(e) => setPassword(e.target.value)}
-                           placeholder="••••••••"
-                           className="w-full bg-white dark:bg-[#1c1c1f] border border-slate-200 dark:border-[#2d2d31] rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none transition-all"
-                         />
+                         <div className="relative">
+                           <input 
+                             type={showPassword ? "text" : "password"}
+                             value={password}
+                             onChange={(e) => setPassword(e.target.value)}
+                             placeholder="••••••••"
+                             className="w-full bg-white dark:bg-[#1c1c1f] border border-slate-200 dark:border-[#2d2d31] rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none transition-all"
+                           />
+                           <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors z-10 p-1"
+                           >
+                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                           </button>
+                         </div>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 relative">
                          <label className="text-xs font-bold text-slate-400 uppercase">Confirm Password</label>
-                         <input 
-                           type="password"
-                           value={confirmPassword}
-                           onChange={(e) => setConfirmPassword(e.target.value)}
-                           placeholder="••••••••"
-                           className="w-full bg-white dark:bg-[#1c1c1f] border border-slate-200 dark:border-[#2d2d31] rounded-xl px-4 py-3 text-sm text-slate-900 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none transition-all"
-                         />
+                         <div className="relative">
+                           <input 
+                             type={showConfirmPassword ? "text" : "password"}
+                             value={confirmPassword}
+                             onChange={(e) => setConfirmPassword(e.target.value)}
+                             placeholder="••••••••"
+                             className="w-full bg-white dark:bg-[#1c1c1f] border border-slate-200 dark:border-[#2d2d31] rounded-xl px-4 py-3 pr-10 text-sm text-slate-900 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 outline-none transition-all"
+                           />
+                           <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors z-10 p-1"
+                           >
+                              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                           </button>
+                         </div>
                       </div>
                    </div>
                  </div>
@@ -214,10 +281,27 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user, onLogout, section, on
                   disabled={loading}
                   className="px-8 py-3 bg-brand-600 dark:bg-brand-500 text-white dark:text-black font-bold rounded-xl text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20 dark:shadow-brand-500/10"
                 >
-                  {loading ? <Loader2 className="animate-spin" size={18} /> : <><Save size={18} /> Save Changes</>}
+                  <Save size={18} /> Save Changes
                 </button>
              </div>
           </form>
+
+          {/* Danger Zone */}
+          <div className="mt-12 pt-8 border-t border-slate-200 dark:border-[#2d2d31]">
+            <h3 className="text-sm font-bold text-rose-600 mb-4">Danger Zone</h3>
+            <div className="flex items-center justify-between p-4 border border-rose-200 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 rounded-xl">
+              <div>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">Delete Account</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Permanently remove your data and access.</p>
+              </div>
+              <button 
+                onClick={handleInitDelete} 
+                className="px-4 py-2 bg-white dark:bg-[#18181b] border border-rose-200 dark:border-rose-900/30 text-rose-600 text-xs font-bold rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors shadow-sm"
+              >
+                Delete Account
+              </button>
+            </div>
+          </div>
         </Card>
       </div>
     );
